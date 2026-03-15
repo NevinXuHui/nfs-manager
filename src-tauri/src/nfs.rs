@@ -52,6 +52,7 @@ pub struct MountStatus {
     pub name: String,
     pub mounted: bool,
     pub mount_point: String,
+    pub actual_path: String,
 }
 
 impl NfsConfig {
@@ -317,6 +318,10 @@ impl NfsConfig {
         }
 
         Ok(())
+    }
+
+    pub fn get_actual_mount_path(&self) -> String {
+        self.get_mount_path().to_string_lossy().to_string()
     }
 
     fn get_mount_path(&self) -> PathBuf {

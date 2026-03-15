@@ -11,6 +11,7 @@ export interface MountStatus {
   name: string;
   mounted: boolean;
   mount_point: string;
+  actual_path: string;
 }
 
 export async function getConfigs(): Promise<NfsConfig[]> {

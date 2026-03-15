@@ -171,7 +171,7 @@ function App() {
                 </div>
                 <div class="config-info">
                   <p><strong>服务器:</strong> {config.server}</p>
-                  <p><strong>挂载点:</strong> {config.mount_point}</p>
+                  <p><strong>挂载点:</strong> {status()?.actual_path || config.mount_point}</p>
                   <p><strong>选项:</strong> {config.options}</p>
                 </div>
                 <div class="config-actions">

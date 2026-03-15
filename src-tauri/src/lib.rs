@@ -127,6 +127,7 @@ fn get_status(state: State<AppState>) -> Result<Vec<MountStatus>, String> {
             name: config.name.clone(),
             mounted: config.is_mounted(),
             mount_point: config.mount_point.clone(),
+            actual_path: config.get_actual_mount_path(),
         })
         .collect();
 

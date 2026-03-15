@@ -157,20 +157,35 @@ impl NfsConfig {
 
         match platform {
             Platform::MacOS => {
-                // macOS requires sudo for NFS umount
-                let force_flag = if force { "-f " } else { "" };
+                // macOS: try diskutil first, fallback to umount -f
+                let diskutil_cmd = if force {
+                    format!("diskutil unmount force {}", mount_path.to_string_lossy())
+                } else {
+                    format!("diskutil unmount {}", mount_path.to_string_lossy())
+                };
+
                 let output = Command::new("osascript")
                     .arg("-e")
                     .arg(format!(
-                        "do shell script \"umount {}{} \" with administrator privileges",
-                        force_flag,
-                        mount_path.to_string_lossy()
+                        "do shell script \"{}\" with administrator privileges",
+                        diskutil_cmd
                     ))
                     .output()?;
 
                 if !output.status.success() {
-                    let err = String::from_utf8_lossy(&output.stderr);
-                    return Err(NfsError::UmountFailed(err.to_string()));
+                    // Fallback to umount -f
+                    let umount_output = Command::new("osascript")
+                        .arg("-e")
+                        .arg(format!(
+                            "do shell script \"umount -f {}\" with administrator privileges",
+                            mount_path.to_string_lossy()
+                        ))
+                        .output()?;
+
+                    if !umount_output.status.success() {
+                        let err = String::from_utf8_lossy(&umount_output.stderr);
+                        return Err(NfsError::UmountFailed(err.to_string()));
+                    }
                 }
             }
             Platform::Linux => {

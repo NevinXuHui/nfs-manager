@@ -99,6 +99,8 @@ pnpm tauri build
 - **批量挂载**: 点击底部的 "挂载全部" 按钮
 - **批量卸载**: 点击底部的 "卸载全部" 按钮
 
+**注意**：首次挂载时，macOS 会弹出权限确认对话框，请点击"确定"并输入密码。
+
 ### 配置文件
 
 配置文件位于 `~/.nfs-manager.conf`，格式：
@@ -107,11 +109,19 @@ pnpm tauri build
 name|server:/path|mount_point|options
 ```
 
+**挂载点说明**：
+- 相对路径（推荐）：如 `company-data`，会自动挂载到 `~/nfs-mounts/company-data`
+- 绝对路径：如 `/Users/username/my-mount`，直接使用该路径
+
 示例：
 
 ```
+# 使用相对路径（推荐）
 company|192.168.1.100:/data|company-data|rw,sync,hard,intr
 backup|192.168.1.200:/backup|backup|ro,sync
+
+# 使用绝对路径
+dev|dev.example.com:/projects|/Users/username/projects|rw,async
 dev|dev.example.com:/projects|projects|rw,async
 ```
 

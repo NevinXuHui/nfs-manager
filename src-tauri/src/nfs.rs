@@ -80,18 +80,52 @@ impl NfsConfig {
         std::fs::create_dir_all(&mount_path)?;
 
         match platform {
-            Platform::MacOS | Platform::Linux => {
-                let output = Command::new("mount")
+            Platform::MacOS => {
+                // macOS requires sudo for NFS mount
+                let output = Command::new("osascript")
+                    .arg("-e")
+                    .arg(format!(
+                        "do shell script \"mount -t nfs -o {} {} {}\" with administrator privileges",
+                        &self.options,
+                        &self.server,
+                        mount_path.to_string_lossy()
+                    ))
+                    .output()?;
+
+                if !output.status.success() {
+                    let err = String::from_utf8_lossy(&output.stderr);
+                    return Err(NfsError::MountFailed(err.to_string()));
+                }
+            }
+            Platform::Linux => {
+                // Linux may need sudo, try with pkexec or sudo
+                let output = Command::new("pkexec")
+                    .arg("mount")
                     .arg("-t")
                     .arg("nfs")
                     .arg("-o")
                     .arg(&self.options)
                     .arg(&self.server)
                     .arg(&mount_path)
-                    .output()?;
+                    .output();
 
-                if !output.status.success() {
-                    let err = String::from_utf8_lossy(&output.stderr);
+                let result = if output.is_err() {
+                    // Fallback to sudo if pkexec not available
+                    Command::new("sudo")
+                        .arg("mount")
+                        .arg("-t")
+                        .arg("nfs")
+                        .arg("-o")
+                        .arg(&self.options)
+                        .arg(&self.server)
+                        .arg(&mount_path)
+                        .output()?
+                } else {
+                    output?
+                };
+
+                if !result.status.success() {
+                    let err = String::from_utf8_lossy(&result.stderr);
                     return Err(NfsError::MountFailed(err.to_string()));
                 }
             }
@@ -122,17 +156,45 @@ impl NfsConfig {
         let mount_path = self.get_mount_path();
 
         match platform {
-            Platform::MacOS | Platform::Linux => {
-                let mut cmd = Command::new("umount");
-                if force {
-                    cmd.arg("-f");
-                }
-                cmd.arg(&mount_path);
-
-                let output = cmd.output()?;
+            Platform::MacOS => {
+                // macOS requires sudo for NFS umount
+                let force_flag = if force { "-f " } else { "" };
+                let output = Command::new("osascript")
+                    .arg("-e")
+                    .arg(format!(
+                        "do shell script \"umount {}{} \" with administrator privileges",
+                        force_flag,
+                        mount_path.to_string_lossy()
+                    ))
+                    .output()?;
 
                 if !output.status.success() {
                     let err = String::from_utf8_lossy(&output.stderr);
+                    return Err(NfsError::UmountFailed(err.to_string()));
+                }
+            }
+            Platform::Linux => {
+                let mut args = vec!["umount"];
+                if force {
+                    args.push("-f");
+                }
+                args.push(mount_path.to_str().unwrap());
+
+                let output = Command::new("pkexec")
+                    .args(&args)
+                    .output();
+
+                let result = if output.is_err() {
+                    // Fallback to sudo
+                    Command::new("sudo")
+                        .args(&args)
+                        .output()?
+                } else {
+                    output?
+                };
+
+                if !result.status.success() {
+                    let err = String::from_utf8_lossy(&result.stderr);
                     return Err(NfsError::UmountFailed(err.to_string()));
                 }
             }
@@ -193,8 +255,14 @@ impl NfsConfig {
 
         match platform {
             Platform::MacOS | Platform::Linux => {
-                let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-                PathBuf::from(&home).join("nfs-mounts").join(&self.mount_point)
+                // If mount_point is an absolute path, use it directly
+                if self.mount_point.starts_with('/') {
+                    PathBuf::from(&self.mount_point)
+                } else {
+                    // Otherwise, use ~/nfs-mounts/ prefix
+                    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+                    PathBuf::from(&home).join("nfs-mounts").join(&self.mount_point)
+                }
             }
             Platform::Windows => {
                 // Windows uses drive letters

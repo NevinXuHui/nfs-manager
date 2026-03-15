@@ -81,11 +81,11 @@ impl NfsConfig {
 
         match platform {
             Platform::MacOS => {
-                // macOS requires sudo for NFS mount
+                // macOS requires sudo and resvport option for NFS mount
                 let output = Command::new("osascript")
                     .arg("-e")
                     .arg(format!(
-                        "do shell script \"mount -t nfs -o {} {} {}\" with administrator privileges",
+                        "do shell script \"mount -t nfs -o resvport,{} {} {}\" with administrator privileges",
                         &self.options,
                         &self.server,
                         mount_path.to_string_lossy()

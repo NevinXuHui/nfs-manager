@@ -31,19 +31,53 @@
 pnpm install
 ```
 
+### 快速开始（推荐）
+
+使用 `run.sh` 脚本：
+
+```bash
+# 启动开发模式
+./run.sh dev
+
+# 构建生产版本
+./run.sh build
+
+# 查看所有命令
+./run.sh help
+```
+
 ### 开发模式
 
 ```bash
+# 使用 run.sh（推荐）
+./run.sh dev
+
+# 或直接使用 pnpm
 pnpm tauri dev
 ```
 
 ### 构建
 
 ```bash
+# 使用 run.sh（推荐）
+./run.sh build
+
+# 或直接使用 pnpm
 pnpm tauri build
 ```
 
 构建产物位于 `src-tauri/target/release/bundle/`
+
+### 其他命令
+
+```bash
+./run.sh test              # 运行测试
+./run.sh check             # 代码检查
+./run.sh format            # 格式化代码
+./run.sh clean             # 清理构建产物
+./run.sh build-frontend    # 仅构建前端
+./run.sh build-backend     # 仅构建后端
+```
 
 ## 使用说明
 

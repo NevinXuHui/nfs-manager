@@ -1,0 +1,301 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: #0f0f0f;
+  background-color: #f6f6f6;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #fff;
+  background-color: #396cd8;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2f5bb7;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.danger {
+  background-color: #dc3545;
+}
+
+button.danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  white-space: pre-wrap;
+}
+
+.config-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.config-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.25s;
+}
+
+.config-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.config-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.status-dot.mounted {
+  background-color: #28a745;
+}
+
+.status-dot.unmounted {
+  background-color: #6c757d;
+}
+
+.config-header h3 {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.config-info {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.config-info p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.config-info strong {
+  color: #333;
+  margin-right: 8px;
+}
+
+.config-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.config-actions button {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+footer {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.dialog h2 {
+  margin-bottom: 24px;
+  font-size: 22px;
+}
+
+.dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dialog input {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.25s;
+}
+
+.dialog input:focus {
+  outline: none;
+  border-color: #396cd8;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.dialog-actions button {
+  padding: 10px 24px;
+}
+
+.dialog-actions button[type="button"] {
+  background-color: #6c757d;
+}
+
+.dialog-actions button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f6f6f6;
+    background-color: #1a1a1a;
+  }
+
+  header {
+    border-bottom-color: #333;
+  }
+
+  .config-card {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .config-info p {
+    color: #ccc;
+  }
+
+  .config-info strong {
+    color: #fff;
+  }
+
+  .status-text {
+    color: #999;
+  }
+
+  footer {
+    border-top-color: #333;
+  }
+
+  .dialog {
+    background: #2a2a2a;
+  }
+
+  .dialog input {
+    background: #1a1a1a;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .error {
+    background-color: #3a1a1a;
+    border-color: #5a2a2a;
+    color: #ff6b6b;
+  }
+}
+

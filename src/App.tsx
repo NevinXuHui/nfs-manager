@@ -8,6 +8,7 @@ function App() {
   const [showAddDialog, setShowAddDialog] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal("");
+  const [mountPathType, setMountPathType] = createSignal<"relative" | "absolute">("relative");
 
   const [newConfig, setNewConfig] = createSignal<NfsConfig>({
     name: "",
@@ -232,24 +233,63 @@ function App() {
                 />
               </label>
               <label>
-                挂载点 *
-                <input
-                  type="text"
-                  value={newConfig().mount_point}
-                  onInput={(e) => setNewConfig({ ...newConfig(), mount_point: e.currentTarget.value })}
-                  placeholder="例如: company-data"
-                  required
-                />
+                挂载点类型 *
+                <select
+                  value={mountPathType()}
+                  onChange={(e) => {
+                    setMountPathType(e.currentTarget.value as "relative" | "absolute");
+                    setNewConfig({ ...newConfig(), mount_point: "" });
+                  }}
+                >
+                  <option value="relative">相对路径（推荐）</option>
+                  <option value="absolute">绝对路径</option>
+                </select>
               </label>
               <label>
-                挂载选项
-                <input
-                  type="text"
-                  value={newConfig().options}
-                  onInput={(e) => setNewConfig({ ...newConfig(), options: e.currentTarget.value })}
-                  placeholder="例如: rw,sync,hard,intr"
-                />
+                挂载点 *
+                <Show when={mountPathType() === "relative"} fallback={
+                  <input
+                    type="text"
+                    value={newConfig().mount_point}
+                    onInput={(e) => setNewConfig({ ...newConfig(), mount_point: e.currentTarget.value })}
+                    placeholder="例如: /Users/username/my-mount"
+                    required
+                  />
+                }>
+                  <input
+                    type="text"
+                    value={newConfig().mount_point}
+                    onInput={(e) => setNewConfig({ ...newConfig(), mount_point: e.currentTarget.value })}
+                    placeholder="例如: company-data"
+                    required
+                  />
+                  <small class="hint">将挂载到: ~/nfs-mounts/{newConfig().mount_point || "..."}</small>
+                </Show>
               </label>
+              <label>
+                挂载选项 *
+                <select
+                  value={newConfig().options}
+                  onChange={(e) => setNewConfig({ ...newConfig(), options: e.currentTarget.value })}
+                >
+                  <option value="rw,sync,hard,intr">读写 + 同步 + 硬挂载（推荐）</option>
+                  <option value="ro,sync,hard,intr">只读 + 同步 + 硬挂载</option>
+                  <option value="rw,async,hard,intr">读写 + 异步 + 硬挂载</option>
+                  <option value="rw,sync,soft,intr">读写 + 同步 + 软挂载</option>
+                  <option value="custom">自定义...</option>
+                </select>
+              </label>
+              <Show when={newConfig().options === "custom"}>
+                <label>
+                  自定义选项
+                  <input
+                    type="text"
+                    value=""
+                    onInput={(e) => setNewConfig({ ...newConfig(), options: e.currentTarget.value })}
+                    placeholder="例如: rw,sync,hard,intr,noexec"
+                  />
+                </label>
+              </Show>
               <div class="dialog-actions">
                 <button type="button" onClick={() => setShowAddDialog(false)}>
                   取消

@@ -44,3 +44,7 @@ export async function umountAll(force: boolean = false): Promise<string[]> {
 export async function getStatus(): Promise<MountStatus[]> {
   return await invoke("get_status");
 }
+
+export async function openMountPoint(name: string): Promise<void> {
+  return await invoke("open_mount_point", { name });
+}

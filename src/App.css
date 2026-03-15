@@ -77,6 +77,14 @@ button.danger:hover:not(:disabled) {
   background-color: #c82333;
 }
 
+button.secondary {
+  background-color: #6c757d;
+}
+
+button.secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
 .error {
   background-color: #fee;
   border: 1px solid #fcc;

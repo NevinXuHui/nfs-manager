@@ -265,6 +265,60 @@ impl NfsConfig {
         }
     }
 
+    pub fn open_in_file_manager(&self) -> Result<(), NfsError> {
+        let platform = Platform::current();
+        let mount_path = self.get_mount_path();
+
+        if !mount_path.exists() {
+            return Err(NfsError::ConfigError(format!(
+                "挂载点不存在: {}",
+                mount_path.display()
+            )));
+        }
+
+        match platform {
+            Platform::MacOS => {
+                Command::new("open")
+                    .arg(&mount_path)
+                    .spawn()
+                    .map_err(|e| NfsError::ConfigError(format!("打开文件管理器失败: {}", e)))?;
+            }
+            Platform::Linux => {
+                // Try xdg-open first, fallback to common file managers
+                let result = Command::new("xdg-open")
+                    .arg(&mount_path)
+                    .spawn();
+
+                if result.is_err() {
+                    // Try common file managers
+                    let file_managers = ["nautilus", "dolphin", "thunar", "nemo", "caja"];
+                    let mut opened = false;
+
+                    for fm in &file_managers {
+                        if Command::new(fm).arg(&mount_path).spawn().is_ok() {
+                            opened = true;
+                            break;
+                        }
+                    }
+
+                    if !opened {
+                        return Err(NfsError::ConfigError(
+                            "未找到可用的文件管理器".to_string(),
+                        ));
+                    }
+                }
+            }
+            Platform::Windows => {
+                Command::new("explorer")
+                    .arg(&mount_path)
+                    .spawn()
+                    .map_err(|e| NfsError::ConfigError(format!("打开文件管理器失败: {}", e)))?;
+            }
+        }
+
+        Ok(())
+    }
+
     fn get_mount_path(&self) -> PathBuf {
         let platform = Platform::current();
 

@@ -1,5 +1,5 @@
 import { createSignal, onMount, For, Show } from "solid-js";
-import { getConfigs, getStatus, mountNfs, umountNfs, mountAll, umountAll, addConfig, removeConfig, type NfsConfig, type MountStatus } from "./api";
+import { getConfigs, getStatus, mountNfs, umountNfs, mountAll, umountAll, addConfig, removeConfig, openMountPoint, type NfsConfig, type MountStatus } from "./api";
 import "./App.css";
 
 function App() {
@@ -126,6 +126,17 @@ function App() {
     }
   }
 
+  async function handleOpen(name: string) {
+    setLoading(true);
+    try {
+      await openMountPoint(name);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function getStatusForConfig(name: string): MountStatus | undefined {
     return statuses().find(s => s.name === name);
   }
@@ -171,6 +182,9 @@ function App() {
                   }>
                     <button onClick={() => handleUmount(config.name)} disabled={loading()}>
                       卸载
+                    </button>
+                    <button onClick={() => handleOpen(config.name)} disabled={loading()} class="secondary">
+                      打开
                     </button>
                   </Show>
                   <button onClick={() => handleRemove(config.name)} disabled={loading()} class="danger">

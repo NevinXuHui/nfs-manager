@@ -133,6 +133,18 @@ fn get_status(state: State<AppState>) -> Result<Vec<MountStatus>, String> {
     Ok(statuses)
 }
 
+#[tauri::command]
+fn open_mount_point(state: State<AppState>, name: String) -> Result<(), String> {
+    let config = state
+        .config_manager
+        .lock()
+        .unwrap()
+        .get_config(&name)
+        .map_err(|e| e.to_string())?;
+
+    config.open_in_file_manager().map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let config_manager = ConfigManager::new().expect("Failed to initialize config manager");
@@ -151,6 +163,7 @@ pub fn run() {
             umount_nfs,
             umount_all,
             get_status,
+            open_mount_point,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

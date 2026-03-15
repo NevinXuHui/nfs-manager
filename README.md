@@ -58,15 +58,46 @@ pnpm tauri dev
 
 ### 构建
 
+**快速构建（当前平台）**
+
 ```bash
-# 使用 run.sh（推荐）
+# 使用 build.sh（推荐）
+./build.sh
+
+# 或使用 run.sh
 ./run.sh build
 
 # 或直接使用 pnpm
 pnpm tauri build
 ```
 
+**多平台构建**
+
+```bash
+# 构建 macOS（需要在 macOS 上运行）
+./build.sh macos
+
+# 构建 Linux
+./build.sh linux
+
+# 构建 Windows
+./build.sh windows
+
+# 查看构建产物
+./build.sh artifacts
+
+# 清理构建产物
+./build.sh clean
+```
+
 构建产物位于 `src-tauri/target/release/bundle/`
+
+**平台说明**
+- **macOS**: 生成 Universal Binary（支持 Intel 和 Apple Silicon）
+- **Linux**: 生成 .deb 和 .AppImage
+- **Windows**: 生成 .msi 和 .exe 安装包
+
+**注意**: 交叉编译需要额外配置，建议在目标平台上进行原生编译。
 
 ### 其他命令
 
